@@ -15,3 +15,6 @@
 
 fx.etl.connector.console.ConsoleSinkFactory
 fx.etl.connector.tidb.TidbSinkFactory
+org.apache.flink.table.sources.CsvBatchTableSourceFactory
+org.apache.flink.streaming.connectors.kafka.Kafka011TableSourceSinkFactory
+org.apache.flink.formats.json.JsonRowFormatFactory

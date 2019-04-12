@@ -38,17 +38,20 @@ public class SqlApp {
         String jsonSchema = complexJsonSchema();
 
         JSONObject data = JSONObject.parseObject(jsonSchema).getJSONObject("properties").getJSONObject("data");
+        System.out.println(data);
 
         TypeInformation<Row> rootRow = JsonRowSchemaConverter.convert(data.toJSONString());
+        System.out.println(rootRow);
+        String sql = "select data.tel,data.innerData.d1,data.mac from phonecontacts";
 
-        String sql = "select domain,data.user_id,data.innerData.d1 from phonecontacts";
-
+        Properties properties = new Properties();
+        properties.put("bootstrap.servers","flink:9092");
 
         tableEnv.connect(new Kafka()
                 .version("0.10")
-                .topic("phonecontacts-topic")
+                .topic("test")
                 .startFromLatest()
-                .properties(new Properties())
+                .properties(properties)
         )
                 .withFormat(new Json().jsonSchema(jsonSchema))
                 .inAppendMode()
@@ -64,6 +67,7 @@ public class SqlApp {
         System.out.println(schema);
 
         TypeInformation<Row> resultRow = JsonRowSchemaConverter.convert(simpleJsonSchema());
+
         tableEnv.toAppendStream(table,resultRow).print();
         env.execute();
 
@@ -101,6 +105,81 @@ public class SqlApp {
                 "mac:{type:'string'}" +
                 "}}" +
                 "}" +
+                "}";
+    }
+    private static String zorkJsonSchema(){
+        return "{\n" +
+                "  \"type\": \"object\",\n" +
+                "  \"properties\": {\n" +
+                "    \"offset\": {\n" +
+                "      \"type\": \"number\"\n" +
+                "    },\n" +
+                "    \"source\": {\n" +
+                "      \"type\": \"string\"\n" +
+                "    },\n" +
+                "    \"timestamp\": {\n" +
+                "      \"type\": \"string\"\n" +
+                "    },\n" +
+                "    \"logTypeName\": {\n" +
+                "      \"type\": \"string\"\n" +
+                "    },\n" +
+                "    \"dimensions\": {\n" +
+                "      \"type\": \"object\",\n" +
+                "      \"properties\": {\n" +
+                "        \"hostname\": {\n" +
+                "          \"type\": \"string\"\n" +
+                "        },\n" +
+                "        \"ip\": {\n" +
+                "          \"type\": \"string\"\n" +
+                "        },\n" +
+                "        \"appsystem\": {\n" +
+                "          \"type\": \"string\"\n" +
+                "        }\n" +
+                "      }\n" +
+                "    },\n" +
+                "    \"measures\": {\n" +
+                "      \"type\": \"object\",\n" +
+                "      \"properties\": {\n" +
+                "        \"delay\": {\n" +
+                "          \"type\": \"string\"\n" +
+                "        }\n" +
+                "      }\n" +
+                "    },\n" +
+                "    \"normalFields\": {\n" +
+                "      \"type\": \"object\",\n" +
+                "      \"properties\": {\n" +
+                "        \"message\": {\n" +
+                "          \"type\": \"string\"\n" +
+                "        },\n" +
+                "        \"logTime\": {\n" +
+                "          \"type\": \"string\"\n" +
+                "        }\n" +
+                "      }\n" +
+                "    }\n" +
+                "  }\n" +
+                "}";
+    }
+
+    private static String simpleZorkJsonSchema(){
+        return "{\n" +
+                "  \"type\": \"object\",\n" +
+                "  \"properties\": {\n" +
+                "    \"timestamp\": {\n" +
+                "      \"type\": \"string\"\n" +
+                "    },\n" +
+                "    \"logTypeName\": {\n" +
+                "      \"type\": \"string\"\n" +
+                "    },\n" +
+                "    \"hostname\": {\n" +
+                "      \"type\": \"string\"\n" +
+                "    },\n" +
+                "    \"ip\": {\n" +
+                "      \"type\": \"string\"\n" +
+                "    },\n" +
+                "    \"appsystem\": {\n" +
+                "      \"type\": \"string\"\n" +
+                "    }\n" +
+                "  }\n" +
                 "}";
     }
 }
